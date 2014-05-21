@@ -16,18 +16,29 @@
  * limitations under the License.
  */
 
-package org.wildfly.sasl.password.spec;
+package org.wildfly.sasl.scram;
 
-import org.wildfly.security.password.spec.PasswordSpec;
+import org.wildfly.sasl.util.AbstractSaslFactory;
 
-public final class MD5DigestPasswordSpec implements PasswordSpec {
-    private final byte[] digest;
+/**
+ * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
+ */
+abstract class ScramFactory extends AbstractSaslFactory {
 
-    public MD5DigestPasswordSpec(final byte[] digest) {
-        this.digest = digest;
+    private final String mdAlgorithm;
+    private final String macAlgorithm;
+
+    ScramFactory(final String name, final String mdAlgorithm, final String macAlgorithm) {
+        super(name);
+        this.mdAlgorithm = mdAlgorithm;
+        this.macAlgorithm = macAlgorithm;
     }
 
-    public byte[] getDigest() {
-        return digest;
+    String getMdAlgorithm() {
+        return mdAlgorithm;
+    }
+
+    String getMacAlgorithm() {
+        return macAlgorithm;
     }
 }

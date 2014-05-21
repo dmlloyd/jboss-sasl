@@ -16,30 +16,61 @@
  * limitations under the License.
  */
 
-package org.wildfly.sasl.password.spec;
+package org.wildfly.sasl.scram;
 
-import org.wildfly.security.password.spec.PasswordSpec;
+import org.wildfly.sasl.password.interfaces.ScramDigestPassword;
 
-public final class ScramDigestPasswordSpec implements PasswordSpec {
+/**
+ * <p>
+ * Implementation of the SCRAM (RFC 5802) digest password.
+ * </p>
+ *
+ * @author <a href="mailto:sguilhen@redhat.com">Stefan Guilhen</a>
+ * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
+ */
+final class ScramDigestPasswordImpl implements ScramDigestPassword {
+
+    private static final long serialVersionUID = 6333840700300129002L;
+
+    private final String algorithm;
     private final byte[] saltedPassword;
     private final byte[] salt;
     private final int iterationCount;
 
-    public ScramDigestPasswordSpec(final byte[] saltedPassword, final byte[] salt, final int iterationCount) {
+    ScramDigestPasswordImpl(final String algorithm, final byte[] saltedPassword, final byte[] salt, final int iterationCount) {
+        this.algorithm = algorithm;
         this.saltedPassword = saltedPassword;
         this.salt = salt;
         this.iterationCount = iterationCount;
     }
 
+    @Override
     public byte[] getSaltedPassword() {
-        return saltedPassword;
+        return saltedPassword.clone();
     }
 
+    @Override
     public byte[] getSalt() {
-        return salt;
+        return salt.clone();
     }
 
+    @Override
     public int getIterationCount() {
         return iterationCount;
+    }
+
+    @Override
+    public String getAlgorithm() {
+        return algorithm;
+    }
+
+    @Override
+    public String getFormat() {
+        return null;
+    }
+
+    @Override
+    public byte[] getEncoded() {
+        return null;
     }
 }

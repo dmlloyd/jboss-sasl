@@ -16,18 +16,18 @@
  * limitations under the License.
  */
 
-package org.wildfly.sasl.password.spec;
+package org.wildfly.sasl.scram;
 
-import org.wildfly.security.password.spec.PasswordSpec;
+import javax.security.sasl.SaslClientFactory;
+import org.kohsuke.MetaInfServices;
 
-public final class MD5DigestPasswordSpec implements PasswordSpec {
-    private final byte[] digest;
+/**
+ * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
+ */
+@MetaInfServices(SaslClientFactory.class)
+public final class ScramSha512PlusClientFactory extends ScramClientFactory {
 
-    public MD5DigestPasswordSpec(final byte[] digest) {
-        this.digest = digest;
-    }
-
-    public byte[] getDigest() {
-        return digest;
+    public ScramSha512PlusClientFactory() {
+        super(Scram.SCRAM_SHA_512_PLUS, "SHA-512", "HmacSHA512", true);
     }
 }

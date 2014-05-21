@@ -25,4 +25,32 @@ import org.wildfly.security.password.OneWayPassword;
  */
 public interface ScramDigestPassword extends OneWayPassword {
 
+    /**
+     * Gets the SCRAM salted password.
+     *
+     * @return a {@code byte[]} containing the salted password
+     */
+    byte[] getSaltedPassword();
+
+    /**
+     * Get the SCRAM salt bytes used to create the salted password.
+     *
+     * @return the salt bytes
+     */
+    byte[] getSalt();
+
+    /**
+     * Get the iteration count used to create the salted password.
+     *
+     * @return the iteration count
+     */
+    int getIterationCount();
+
+    /**
+     * Get the algorithm name of the associated SCRAM mechanism.
+     *
+     * @return the algorithm name
+     */
+    @Override
+    String getAlgorithm();
 }
