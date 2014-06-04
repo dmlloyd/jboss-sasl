@@ -19,13 +19,17 @@
 package org.wildfly.sasl.callback;
 
 import javax.security.auth.callback.Callback;
+import org.wildfly.security.auth.callback.CredentialCallback;
 
 /**
  * A Callback to indicate the password has been verified instead of retrieving the
  * password.
  *
  * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
+ *
+ * @deprecated Replaced by {@link CredentialCallback}.
  */
+@Deprecated
 public class VerifyPasswordCallback implements Callback {
 
     private final String password;

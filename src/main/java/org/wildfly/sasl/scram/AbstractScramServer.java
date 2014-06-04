@@ -25,6 +25,7 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javax.crypto.Mac;
@@ -63,6 +64,7 @@ abstract class AbstractScramServer extends AbstractSaslServer {
     private String authorizationID;
     private String loginName;
     private String bindingType;
+    private byte[] bindingData;
     private byte[] clientFirstMessage;
     private int clientFirstMessageLen;
     private byte[] serverFirstMessage;
@@ -70,14 +72,13 @@ abstract class AbstractScramServer extends AbstractSaslServer {
     private byte[] saltedPassword;
     private int iterationCount;
     private byte[] salt;
-    private final boolean sendErrors = false;
 
     AbstractScramServer(final String mechanismName, final String protocol, final String serverName, final CallbackHandler callbackHandler, final boolean plus, final Map<String, ?> props, final MessageDigest messageDigest, final Mac mac) {
         super(mechanismName, protocol, serverName, callbackHandler);
         this.messageDigest = messageDigest;
         this.mac = mac;
-        minimumIterationCount = getIntProperty(props, WildFlySasl.SCRAM_MIN_ITERATION_COUNT, 4096);
-        maximumIterationCount = getIntProperty(props, WildFlySasl.SCRAM_MAX_ITERATION_COUNT, 32768);
+        minimumIterationCount = getIntProperty(props, Scram.MIN_ITERATION_COUNT, 4096);
+        maximumIterationCount = getIntProperty(props, Scram.MAX_ITERATION_COUNT, 32768);
         final String rngName = getStringProperty(props, WildFlySasl.SECURE_RNG, null);
         SecureRandom secureRandom = null;
         if (rngName != null) {
@@ -97,6 +98,8 @@ abstract class AbstractScramServer extends AbstractSaslServer {
     String getLoginName() {
         return loginName;
     }
+
+    abstract Password getPassword();
 
     public byte[] evaluateResponse(final byte[] response) throws SaslException {
         try {
@@ -184,7 +187,7 @@ abstract class AbstractScramServer extends AbstractSaslServer {
                     // nonce (client + server nonce)
                     b.append('r').append('=');
                     b.append(response, nonce, nonceEnd - nonce);
-                    b.append(ScramUtils.generateRandomString(12, ThreadLocalRandom.current()));
+                    b.append(ScramUtils.generateRandomString(12, getRandom()));
                     b.append(',');
 
                     // salted password
@@ -192,7 +195,7 @@ abstract class AbstractScramServer extends AbstractSaslServer {
                         PasswordFactory pf = PasswordFactory.getInstance("clear");
                         char[] passwordChars = pf.getKeySpec(password, ClearPasswordSpec.class).getEncodedPassword();
                         // todo salt length
-                        ThreadLocalRandom.current().nextBytes(salt = new byte[16]);
+                        getRandom().nextBytes(salt = new byte[16]);
                         // get the clear password
                         StringPrep.encode(passwordChars, b, StringPrep.NORMALIZE_KC);
                         saltedPassword = ScramUtils.calculateHi(mac, passwordChars, salt, 0, salt.length, iterationCount);
@@ -286,12 +289,6 @@ abstract class AbstractScramServer extends AbstractSaslServer {
                     ScramUtils.xor(recoveredClientKey, response, s, i - s);
                     if (! Arrays.equals(recoveredClientKey, clientKey)) {
                         // bad auth, send error
-                        if (sendErrors) {
-                            b.setLength(0);
-                            b.append("e=invalid-proof");
-                            state = S_ERROR;
-                            return b.toArray();
-                        }
                         throw new SaslException("Authentication rejected (invalid proof)");
                     }
 
@@ -316,6 +313,11 @@ abstract class AbstractScramServer extends AbstractSaslServer {
         throw invalidClientMessage();
     }
 
+    private Random getRandom() {
+        if (secureRandom != null) return secureRandom;
+        return ThreadLocalRandom.current();
+    }
+
     public void dispose() throws SaslException {
         clientFirstMessage = null;
         serverFirstMessage = null;
@@ -326,6 +328,14 @@ abstract class AbstractScramServer extends AbstractSaslServer {
 
     public boolean isComplete() {
         return state == S_COMPLETE;
+    }
+
+    public Object getNegotiatedProperty(final String propName) {
+        switch (propName) {
+            case WildFlySasl.CHANNEL_BINDING_TYPE: return bindingType;
+            case WildFlySasl.CHANNEL_BINDING_DATA: return bindingData;
+            default: return null;
+        }
     }
 
     static SaslException invalidClientMessage() {

@@ -28,16 +28,6 @@ import java.security.SecureRandom;
 public final class WildFlySasl {
 
     /**
-     * The minimum iteration count to use for SCRAM.  Default is 4096.
-     */
-    public static final String SCRAM_MIN_ITERATION_COUNT = "wildfly.sasl.scram.min-iteration-count";
-
-    /**
-     * The maximum iteration count to use for SCRAM.  Default is 16384.
-     */
-    public static final String SCRAM_MAX_ITERATION_COUNT = "wildfly.sasl.scram.max-iteration-count";
-
-    /**
      * Property name for the algorithm name of a {@link SecureRandom} implementation to use.  Using this property can
      * improve security, at the cost of performance.
      */

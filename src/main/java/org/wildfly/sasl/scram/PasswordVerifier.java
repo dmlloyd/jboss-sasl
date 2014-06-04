@@ -35,17 +35,12 @@ import org.wildfly.security.password.spec.ClearPasswordSpec;
 import org.wildfly.security.password.spec.EncryptablePasswordSpec;
 import org.wildfly.security.password.spec.HashedPasswordAlgorithmSpec;
 
-/**
- * Verifier for SCRAM.  The proof is the ServerSignature value.
- *
- * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
- */
-class ScramVerifier extends Verifier<ScramDigestPassword> {
+class PasswordVerifier extends Verifier<ScramDigestPassword> {
     private final String algorithm;
     private final int iterationCount;
     private final byte[] salt;
 
-    ScramVerifier(final String algorithm, final int iterationCount, final byte[] salt) {
+    PasswordVerifier(final String algorithm, final int iterationCount, final byte[] salt) {
         this.algorithm = algorithm;
         this.iterationCount = iterationCount;
         this.salt = salt;

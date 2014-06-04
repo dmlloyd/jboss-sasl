@@ -40,7 +40,7 @@ import org.wildfly.security.password.spec.HashedPasswordAlgorithmSpec;
  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
  */
 @MetaInfServices(PasswordFactorySpi.class)
-public final class ScramSaslPasswordFactorySpiImpl extends PasswordFactorySpi {
+public final class ScramPasswordFactorySpiImpl extends PasswordFactorySpi {
 
     protected Password engineGeneratePassword(final String algorithm, final KeySpec keySpec) throws InvalidKeySpecException {
         final int keyLength;

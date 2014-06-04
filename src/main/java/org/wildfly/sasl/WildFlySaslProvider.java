@@ -21,25 +21,20 @@ package org.wildfly.sasl;
 import static org.wildfly.sasl.anonymous.AbstractAnonymousFactory.ANONYMOUS;
 import static org.wildfly.sasl.localuser.LocalUserSaslFactory.JBOSS_LOCAL_USER;
 import static org.wildfly.sasl.plain.PlainServerFactory.PLAIN;
-import static org.wildfly.sasl.scram.Scram.SCRAM_SHA_1;
-import static org.wildfly.sasl.scram.Scram.SCRAM_SHA_1_PLUS;
-import static org.wildfly.sasl.scram.Scram.SCRAM_SHA_256;
-import static org.wildfly.sasl.scram.Scram.SCRAM_SHA_256_PLUS;
-import static org.wildfly.sasl.scram.Scram.SCRAM_SHA_384;
-import static org.wildfly.sasl.scram.Scram.SCRAM_SHA_384_PLUS;
-import static org.wildfly.sasl.scram.Scram.SCRAM_SHA_512;
-import static org.wildfly.sasl.scram.Scram.SCRAM_SHA_512_PLUS;
 
 import java.security.Provider;
 
 import javax.security.sasl.SaslClientFactory;
 import javax.security.sasl.SaslServerFactory;
 
+import org.kohsuke.MetaInfServices;
 import org.wildfly.sasl.anonymous.AnonymousClientFactory;
 import org.wildfly.sasl.anonymous.AnonymousServerFactory;
 import org.wildfly.sasl.localuser.LocalUserClientFactory;
 import org.wildfly.sasl.localuser.LocalUserServerFactory;
 import org.wildfly.sasl.plain.PlainServerFactory;
+import org.wildfly.sasl.scram.Scram;
+import org.wildfly.sasl.scram.ScramPasswordFactorySpiImpl;
 import org.wildfly.sasl.scram.ScramSha1ClientFactory;
 import org.wildfly.sasl.scram.ScramSha1PlusClientFactory;
 import org.wildfly.sasl.scram.ScramSha256ClientFactory;
@@ -48,19 +43,22 @@ import org.wildfly.sasl.scram.ScramSha384ClientFactory;
 import org.wildfly.sasl.scram.ScramSha384PlusClientFactory;
 import org.wildfly.sasl.scram.ScramSha512ClientFactory;
 import org.wildfly.sasl.scram.ScramSha512PlusClientFactory;
-
+import org.wildfly.security.password.Password;
 
 /**
  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
  * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
  */
+@MetaInfServices(Provider.class)
 public class WildFlySaslProvider extends Provider {
+
+    private static final long serialVersionUID = -6687682039965913189L;
 
     private static final String INFO = "JBoss SASL Provider " + getVersionString();
 
     private static final String SASL_CLIENT_FACTORY = SaslClientFactory.class.getSimpleName();
-
     private static final String SASL_SERVER_FACTORY = SaslServerFactory.class.getSimpleName();
+    private static final String PASSWORD = Password.class.getSimpleName();
 
     private static final String DOT = ".";
 
@@ -75,14 +73,29 @@ public class WildFlySaslProvider extends Provider {
         put(SASL_SERVER_FACTORY + DOT + PLAIN, PlainServerFactory.class.getName());
         put(SASL_SERVER_FACTORY + DOT + JBOSS_LOCAL_USER, LocalUserServerFactory.class.getName());
         put(SASL_CLIENT_FACTORY + DOT + JBOSS_LOCAL_USER, LocalUserClientFactory.class.getName());
-        put(SASL_CLIENT_FACTORY + DOT + SCRAM_SHA_1, ScramSha1ClientFactory.class.getName());
-        put(SASL_CLIENT_FACTORY + DOT + SCRAM_SHA_1_PLUS, ScramSha1PlusClientFactory.class.getName());
-        put(SASL_CLIENT_FACTORY + DOT + SCRAM_SHA_256, ScramSha256ClientFactory.class.getName());
-        put(SASL_CLIENT_FACTORY + DOT + SCRAM_SHA_256_PLUS, ScramSha256PlusClientFactory.class.getName());
-        put(SASL_CLIENT_FACTORY + DOT + SCRAM_SHA_384, ScramSha384ClientFactory.class.getName());
-        put(SASL_CLIENT_FACTORY + DOT + SCRAM_SHA_384_PLUS, ScramSha384PlusClientFactory.class.getName());
-        put(SASL_CLIENT_FACTORY + DOT + SCRAM_SHA_512, ScramSha512ClientFactory.class.getName());
-        put(SASL_CLIENT_FACTORY + DOT + SCRAM_SHA_512_PLUS, ScramSha512PlusClientFactory.class.getName());
+
+        putService(new Service(this, SASL_CLIENT_FACTORY, Scram.SCRAM_SHA_1, ScramSha1ClientFactory.class.getName(), null, null));
+        putService(new Service(this, SASL_CLIENT_FACTORY, Scram.SCRAM_SHA_1_PLUS, ScramSha1PlusClientFactory.class.getName(), null, null));
+        putService(new Service(this, SASL_CLIENT_FACTORY, Scram.SCRAM_SHA_256, ScramSha256ClientFactory.class.getName(), null, null));
+        putService(new Service(this, SASL_CLIENT_FACTORY, Scram.SCRAM_SHA_256_PLUS, ScramSha256PlusClientFactory.class.getName(), null, null));
+        putService(new Service(this, SASL_CLIENT_FACTORY, Scram.SCRAM_SHA_384, ScramSha384ClientFactory.class.getName(), null, null));
+        putService(new Service(this, SASL_CLIENT_FACTORY, Scram.SCRAM_SHA_384_PLUS, ScramSha384PlusClientFactory.class.getName(), null, null));
+        putService(new Service(this, SASL_CLIENT_FACTORY, Scram.SCRAM_SHA_512, ScramSha512ClientFactory.class.getName(), null, null));
+        putService(new Service(this, SASL_CLIENT_FACTORY, Scram.SCRAM_SHA_512_PLUS, ScramSha512PlusClientFactory.class.getName(), null, null));
+
+        putService(new Service(this, SASL_SERVER_FACTORY, Scram.SCRAM_SHA_1, ScramSha1ServerFactory.class.getName(), null, null));
+        putService(new Service(this, SASL_SERVER_FACTORY, Scram.SCRAM_SHA_1_PLUS, ScramSha1PlusServerFactory.class.getName(), null, null));
+        putService(new Service(this, SASL_SERVER_FACTORY, Scram.SCRAM_SHA_256, ScramSha256ServerFactory.class.getName(), null, null));
+        putService(new Service(this, SASL_SERVER_FACTORY, Scram.SCRAM_SHA_256_PLUS, ScramSha256PlusServerFactory.class.getName(), null, null));
+        putService(new Service(this, SASL_SERVER_FACTORY, Scram.SCRAM_SHA_384, ScramSha384ServerFactory.class.getName(), null, null));
+        putService(new Service(this, SASL_SERVER_FACTORY, Scram.SCRAM_SHA_384_PLUS, ScramSha384PlusServerFactory.class.getName(), null, null));
+        putService(new Service(this, SASL_SERVER_FACTORY, Scram.SCRAM_SHA_512, ScramSha512ServerFactory.class.getName(), null, null));
+        putService(new Service(this, SASL_SERVER_FACTORY, Scram.SCRAM_SHA_512_PLUS, ScramSha512PlusServerFactory.class.getName(), null, null));
+
+        putService(new Service(this, PASSWORD, Scram.SCRAM_SHA_1,   ScramPasswordFactorySpiImpl.class.getName(), null, null));
+        putService(new Service(this, PASSWORD, Scram.SCRAM_SHA_256, ScramPasswordFactorySpiImpl.class.getName(), null, null));
+        putService(new Service(this, PASSWORD, Scram.SCRAM_SHA_384, ScramPasswordFactorySpiImpl.class.getName(), null, null));
+        putService(new Service(this, PASSWORD, Scram.SCRAM_SHA_512, ScramPasswordFactorySpiImpl.class.getName(), null, null));
     }
 
     /**

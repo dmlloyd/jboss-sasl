@@ -34,6 +34,15 @@ public final class Scram {
     public static final String SCRAM_SHA_512 = "SCRAM-SHA-512";
     public static final String SCRAM_SHA_512_PLUS = "SCRAM-SHA-512-PLUS";
 
+    /**
+     * The minimum iteration count to use for SCRAM.  Default is 4096.
+     */
+    public static final String MIN_ITERATION_COUNT = "wildfly.sasl.scram.min-iteration-count";
+    /**
+     * The maximum iteration count to use for SCRAM.  Default is 16384.
+     */
+    public static final String MAX_ITERATION_COUNT = "wildfly.sasl.scram.max-iteration-count";
+
     static final byte[] CLIENT_KEY_BYTES = "Client Key".getBytes(StandardCharsets.UTF_8);
     static final byte[] SERVER_KEY_BYTES = "Server Key".getBytes(StandardCharsets.UTF_8);
 }

@@ -27,4 +27,6 @@ import org.wildfly.sasl.WildFlySaslProvider;
  */
 @Deprecated
 public final class JBossSaslProvider extends WildFlySaslProvider {
+
+    private static final long serialVersionUID = 7613128233053194670L;
 }

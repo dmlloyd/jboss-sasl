@@ -21,6 +21,7 @@ package org.wildfly.sasl.callback;
 import javax.security.auth.callback.Callback;
 
 import org.wildfly.sasl.util.HexConverter;
+import org.wildfly.security.auth.callback.CredentialCallback;
 
 /**
  * Callback to allow Digest mechanisms to request the pre-digested {username : realm : password} value
@@ -33,7 +34,10 @@ import org.wildfly.sasl.util.HexConverter;
  * should the get method be called.
  *
  * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
+ *
+ * @deprecated Replaced by {@link CredentialCallback}.
  */
+@Deprecated
 public class DigestHashCallback implements Callback {
 
     private String hexHash = null;
